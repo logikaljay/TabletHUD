@@ -255,54 +255,58 @@ namespace TabletHUD
                 c.HealthCurrent = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Cur);
 
                 int zoneId = Enigma.D3.Helpers.WorldHelper.GetLocalWorld().x0C_Id;
-                
-                double experience = oldExperience - c.ExperienceEarned;
-                if (c.ExperienceEarnedTotal > 0)
-                {
-                    experienceEarnedTotal = c.ExperienceEarnedTotal;
-                    experienceStartPosition = experienceEarnedTotal;
-                }
-                else
-                {
-                    experienceEarnedTotal += experience;
-                }
 
-                c.ExperienceEarned += experience;
-                
-
-                if (c.Zones.ContainsKey(zoneId))
+                if (oldExperience != 0)
                 {
-                    // zone exists in list - append experience to this zone.
-                    c.Zones[zoneId].ExperienceEarned += experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
-                    c.Zones[zoneId].Duration += (double)Settings.Interval / (double)1000;
-                    c.Zones[zoneId].Enter = DateTime.Now;
-                }
-                else
-                {
-                    Zone zone = new Zone();
-                    zone.Id = zoneId;
-                    zone.Enter = DateTime.Now;
-                    zone.ExperienceEarned = experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
-                    c.Zones.Add(zoneId, zone);
-                    currentZone = zoneId;
-                }
-
-                c.ExperienceEarnedTotal = experienceEarnedTotal;
-
-                if (currentZone != zoneId)
-                {
-                    // update the previous zone - if it exists
-                    if (c.Zones.ContainsKey(currentZone))
+                    double experience = c.ExperienceEarned - oldExperience;
+                    if (c.ExperienceEarnedTotal > 0)
                     {
-                        c.Zones[currentZone].Leave = DateTime.Now;
+                        experienceEarnedTotal = c.ExperienceEarnedTotal;
+                        experienceStartPosition = experienceEarnedTotal;
+                    }
+                    else
+                    {
+                        experienceEarnedTotal += experience;
                     }
 
-                    // zone has changed - set experienceStartPosition to experienceEarnedTotal
-                    experienceStartPosition = experienceEarnedTotal;
-                }
-                
+                    c.ExperienceEarned += experience;
 
-                oldExperience = c.ExperienceEarned;
+
+                    if (c.Zones.ContainsKey(zoneId))
+                    {
+                        // zone exists in list - append experience to this zone.
+                        c.Zones[zoneId].ExperienceEarned += experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
+                        c.Zones[zoneId].Duration += (double)Settings.Interval / (double)1000;
+                        c.Zones[zoneId].Enter = DateTime.Now;
+                    }
+                    else
+                    {
+                        Zone zone = new Zone();
+                        zone.Id = zoneId;
+                        zone.Enter = DateTime.Now;
+                        zone.ExperienceEarned = experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
+                        c.Zones.Add(zoneId, zone);
+                        currentZone = zoneId;
+                    }
+
+                    c.ExperienceEarnedTotal = experienceEarnedTotal;
+
+                    if (currentZone != zoneId)
+                    {
+                        // update the previous zone - if it exists
+                        if (c.Zones.ContainsKey(currentZone))
+                        {
+                            c.Zones[currentZone].Leave = DateTime.Now;
+                        }
+
+                        // zone has changed - set experienceStartPosition to experienceEarnedTotal
+                        experienceStartPosition = experienceEarnedTotal;
+                    }
+                }
+                else
+                {
+                    oldExperience = c.ExperienceEarned;
+                }
             
                 Send(c);
             }
