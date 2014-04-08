@@ -121,7 +121,8 @@
 			
 			var player = $.connection.characterHub;
 			player.client.addMessage = function(data) {
-				var obj = JSON.parse(data);
+			    var obj = JSON.parse(data);
+			    console.log(obj);
 				$xpBar.progressbar("option", {
 					value: obj.ExperiencePercent
 				});
