@@ -17,6 +17,8 @@ namespace TabletHUD
     using Microsoft.AspNet.SignalR;
     using Newtonsoft.Json;
     using Enigma.D3;
+    using ServiceStack.Redis;
+    using ServiceStack.Redis.Generic;
 
     /// <summary>
     /// Transport Hub for TabletHUD
@@ -93,18 +95,43 @@ namespace TabletHUD
 
             if (Settings.Debug)
             {
-                c = Settings.DebugCharacter;              
+                if (c == null)
+                {
+                    c = Settings.DebugCharacter;
+                }
             }
             else
             {
-                c = new Character();
+                if (c == null)
+                {
+                    c = new Character();
+                }
+
                 c.Debug = Settings.Debug;
 
                 // Setup the memory watcher
                 Program.Instance = Engine.Create();
                 Program.CurrentActor = Enigma.D3.Helpers.ActorHelper.GetLocalActor();
                 Program.CurrentACD = Enigma.D3.Helpers.ActorCommonDataHelper.GetLocalAcd();
+                c.Id = Program.CurrentActor.x000_Id;
             }
+
+            // get our character from redis if it exists.
+            using (var redisClient = new RedisClient(Settings.RedisHost, Settings.RedisPort))
+            {
+                IRedisTypedClient<Character> redis = redisClient.As<Character>();
+                var currentCharacters = redis.Lists["urn:characters:current"];
+                if (currentCharacters.Count > 0)
+                {
+                    // retrieve our character from redis with the appropriate debug flag.
+                    var character = currentCharacters.SingleOrDefault(ch => ch.Id == c.Id && ch.Debug == Settings.Debug);
+                    if (character != default(Character))
+                    {
+                        c = character;
+                    }
+                }
+            }
+
 
             t = new Timer(Settings.Interval);
             t.Elapsed += TimerElapsedHandler;
@@ -153,6 +180,12 @@ namespace TabletHUD
             if (Settings.Debug)
             {
                 Zone z = null;
+
+                if (c.ExperienceEarnedTotal > 0)
+                {
+                    experienceEarnedTotal = c.ExperienceEarnedTotal;
+                    experienceStartPosition = experienceEarnedTotal;
+                }
 
                 // add a random number to experience earned
                 Random r = new Random(DateTime.Now.Millisecond);
@@ -222,50 +255,65 @@ namespace TabletHUD
                 c.HealthCurrent = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Cur);
 
                 int zoneId = Enigma.D3.Helpers.WorldHelper.GetLocalWorld().x0C_Id;
-
-                Zone z = null;
-
-                if (oldExperience != 0)
+                
+                double experience = oldExperience - c.ExperienceEarned;
+                if (c.ExperienceEarnedTotal > 0)
                 {
-                    double experience = oldExperience - c.ExperienceEarned;
-                    experienceEarnedTotal += experience;
-                    c.ExperienceEarned += experience;
-
-                    if (c.Zones.ContainsKey(zoneId))
-                    {
-                        // zone exists in list - append experience to this zone.
-                        c.Zones[zoneId].ExperienceEarned += experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
-                        c.Zones[zoneId].Duration += (double)Settings.Interval / (double)1000;
-                        c.Zones[zoneId].Enter = DateTime.Now;
-                    }
-                    else
-                    {
-                        Zone zone = new Zone();
-                        zone.Id = zoneId;
-                        zone.Enter = DateTime.Now;
-                        zone.ExperienceEarned = experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
-                        c.Zones.Add(zoneId, zone);
-                        currentZone = zoneId;
-                    }
-
-                    c.ExperienceEarnedTotal = experienceEarnedTotal;
-
-                    if (currentZone != zoneId)
-                    {
-                        // update the previous zone - if it exists
-                        if (c.Zones.ContainsKey(currentZone))
-                        {
-                            c.Zones[currentZone].Leave = DateTime.Now;
-                        }
-
-                        // zone has changed - set experienceStartPosition to experienceEarnedTotal
-                        experienceStartPosition = experienceEarnedTotal;
-                    }
+                    experienceEarnedTotal = c.ExperienceEarnedTotal;
+                    experienceStartPosition = experienceEarnedTotal;
                 }
+                else
+                {
+                    experienceEarnedTotal += experience;
+                }
+
+                c.ExperienceEarned += experience;
+                
+
+                if (c.Zones.ContainsKey(zoneId))
+                {
+                    // zone exists in list - append experience to this zone.
+                    c.Zones[zoneId].ExperienceEarned += experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
+                    c.Zones[zoneId].Duration += (double)Settings.Interval / (double)1000;
+                    c.Zones[zoneId].Enter = DateTime.Now;
+                }
+                else
+                {
+                    Zone zone = new Zone();
+                    zone.Id = zoneId;
+                    zone.Enter = DateTime.Now;
+                    zone.ExperienceEarned = experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
+                    c.Zones.Add(zoneId, zone);
+                    currentZone = zoneId;
+                }
+
+                c.ExperienceEarnedTotal = experienceEarnedTotal;
+
+                if (currentZone != zoneId)
+                {
+                    // update the previous zone - if it exists
+                    if (c.Zones.ContainsKey(currentZone))
+                    {
+                        c.Zones[currentZone].Leave = DateTime.Now;
+                    }
+
+                    // zone has changed - set experienceStartPosition to experienceEarnedTotal
+                    experienceStartPosition = experienceEarnedTotal;
+                }
+                
 
                 oldExperience = c.ExperienceEarned;
             
                 Send(c);
+            }
+
+            using (var redisClient = new RedisClient(Settings.RedisHost, Settings.RedisPort))
+            {
+                IRedisTypedClient<Character> redis = redisClient.As<Character>();
+                var currentCharacters = redis.Lists["urn:characters:current"];
+
+                currentCharacters.RemoveAll();
+                currentCharacters.Add(c);
             }
         }
     }

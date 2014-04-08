@@ -72,6 +72,35 @@ namespace TabletHUD
 
                 return interval;
             }
+        }       
+
+        public static string RedisHost
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["redisHost"]))
+                {
+                    return ConfigurationManager.AppSettings["redisHost"];
+                }
+                else
+                {
+                    return "localhost";
+                }
+            }
+        }
+
+        public static int RedisPort
+        {
+            get
+            {
+                int port = 6379;
+                if (!int.TryParse(ConfigurationManager.AppSettings["redisPort"].ToString(), out port))
+                {
+                    port = 6379;
+                }
+                
+                return port;
+            }
         }
 
         public static string Url

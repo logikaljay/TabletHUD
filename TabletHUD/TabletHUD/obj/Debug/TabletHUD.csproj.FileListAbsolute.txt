@@ -91,3 +91,11 @@ F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\Web\js\jquery-ui-1.10.4.custom.min.js
 F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\Web\js\jquery.signalR-2.0.3.js
 F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\Web\js\jquery.signalR-2.0.3.min.js
 F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\Web\browserconfig.xml
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Common.dll
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Interfaces.dll
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Redis.dll
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Text.dll
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Common.xml
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Interfaces.xml
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Redis.xml
+F:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Text.xml
