@@ -1,0 +1,179 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="msapplication-config" content="browserconfig.xml" />
+<link href="css/ui-darkness/jquery-ui-1.10.4.custom.css" rel='stylesheet' media='screen' />
+<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.js"></script>
+<script type="text/javascript" src="js/jquery.signalR-2.0.3.js"></script>
+<script type="text/javascript" src="http://localhost:9001/signalr/hubs"></script>
+<style>
+  .ui-progressbar {
+    position: relative;
+  }
+  .progress-label {
+    position: absolute;
+    left:20px;
+    top: 4px;
+    font-weight: bold;
+	color:#fff;
+  }
+  
+  .styleTable { border-collapse: separate; }
+	.styleTable TD { font-weight: normal !important; padding: .4em; border-top-width: 0px !important; }
+	.styleTable TH { text-align: center; padding: .8em .4em; }
+	.styleTable TD.first, .styleTable TH.first { border-left-width: 0px !important; }
+</style>
+</head>
+<body>
+	<h2 class="experience-title">Experience</h2>
+	<div id="experience">
+		<div id="progress"><div class="progress-label">Loading...</div></div>
+	</div>
+	
+	<h2>Health</h2>
+	<div id="health">
+		<div id="progress"><div class="progress-label">Loading...</div></div>
+	</div>
+	
+	<h2>Areas</h2>
+	<table class='styleTable'>
+	<thead>
+	<td>Area</td>
+	<td>Experience</td>
+	<td>Time</td>
+	<td>Entered</td>
+	<td>Left</td>
+	</thead>
+	<tbody class="areas">
+	</body>
+	</table>
+	
+	<script type="text/javascript">
+		$(function() {
+		
+			$.connection.hub.url = "http://localhost:9001/signalr";
+			// $.connection.hub.logging = true;
+			
+			$xpTitle = $(".experience-title");
+			$xpBar = $("#experience").find("#progress").progressbar({value: false});
+			$xpBarLabel = $("#experience").find(".progress-label");
+			
+			$hpBar = $("#health").find("#progress").progressbar({value: false});
+			$hpBarLabel = $("#health").find(".progress-label");
+			
+			var player = $.connection.characterHub;
+			player.client.addMessage = function(data) {
+				var obj = JSON.parse(data);
+				$xpBar.progressbar("option", {
+					value: obj.ExperiencePercent
+				});
+				
+				$xpTitle.text(obj.Name + " - Level: " + obj.Level + " (" + obj.Paragon + ")");
+				$xpBarLabel.text(obj.ExperienceEarned.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " / " + obj.ExperienceNeeded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " (" + obj.ExperiencePercent + "%)");
+				
+				$hpBar.progressbar("option", {
+					value: obj.HealthPercent
+				});
+				$hpBarLabel.text(obj.HealthCurrent.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " / " + obj.HealthTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " (" + obj.HealthPercent + "%)");
+				
+				var areas = obj.Zones;
+				var html = "";
+				for (var key in areas) {
+					var area = areas[key];
+					
+					html += "<tr>" + 
+								"<td>" +
+									area.Id +
+								"</td>" +
+								"<td>" + 
+									area.ExperienceEarned +
+								"</td>" +
+								"<td>" + 
+									area.Duration + " s" +
+								"</td>" +
+								"<td>" +
+									area.Enter +
+								"</td>" +
+								"<td>" +
+									area.Leave +
+								"</td>" +
+							"</tr>";
+							   
+				};
+				$(".areas").html(html);
+				$(".areas").styleTable();
+			};
+			
+			/*
+			var zone = $.connection.zoneHub;
+			zone.client.addMessage = function(data) {
+				console.log(JSON.parse(data));
+				var areas = JSON.parse(data);
+				areas.map(function(area, index) {
+					var html = "<tr>" + 
+								"<td>" +
+									area.ZoneId +
+								"</td>" +
+								"<td>" + 
+									(area.ExperienceEnd - area.ExperienceStart) +
+								"</td>" +
+								"<td>" + 
+									area.Duration + " s" +
+								"</td>" +
+								"<td>" +
+									area.Enter +
+								"</td>" +
+								"<td>" +
+									area.Leave +
+								"</td>" +
+							   "</tr>";
+							   
+					$(".areas").append(html);
+				});
+				$(".areas").styleTable();
+			};
+			*/
+			
+			$.connection.hub.start().done(function() {
+				// console.log("listening for messages");
+			});
+			
+			
+		});
+	</script>
+	
+	<script type="text/javascript">
+	(function ($) {
+        $.fn.styleTable = function (options) {
+            var defaults = {
+                css: 'styleTable'
+            };
+            options = $.extend(defaults, options);
+
+            return this.each(function () {
+
+                input = $(this);
+                input.addClass(options.css);
+
+                input.find("tr").on('mouseover mouseout', function (event) {
+                    if (event.type == 'mouseover') {
+                        $(this).children("td").addClass("ui-state-hover");
+                    } else {
+                        $(this).children("td").removeClass("ui-state-hover");
+                    }
+                });
+
+                input.find("th").addClass("ui-state-default");
+                input.find("td").addClass("ui-widget-content");
+
+                input.find("tr").each(function () {
+                    $(this).children("td:not(:first)").addClass("first");
+                    $(this).children("th:not(:first)").addClass("first");
+                });
+            });
+        };
+    })(jQuery);
+	</script>
+</body>
+</html>
