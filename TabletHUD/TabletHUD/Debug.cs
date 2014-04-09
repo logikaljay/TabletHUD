@@ -1,16 +1,25 @@
-﻿using Enigma.D3;
-using ServiceStack.Redis;
-using ServiceStack.Redis.Generic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using TabletHUD.Infrastructure;
+﻿// -----------------------------------------------------------------------
+// <copyright file="Debug.cs" company="4o4">
+// Copyright 2014 Efinity Group Limited. All Rights Reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace TabletHUD
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Timers;
+    using Enigma.D3;
+    using ServiceStack.Redis;
+    using ServiceStack.Redis.Generic;
+    using TabletHUD.Infrastructure;
+
+    /// <summary>
+    /// Debug class for running TabletHUD in the console.
+    /// </summary>
     public class Debug
     {
         /// <summary>
@@ -43,135 +52,129 @@ namespace TabletHUD
         /// </summary>
         private Timer t;
 
-        private Dictionary<int, AreaModel> Areas;
-
+        /// <summary>
+        /// Runs TabletHUD in the console.
+        /// </summary>
         public void RunConsole()
         {
-            if (true)
+            if (this.c == null)
             {
-                Console.ReadLine();
+                this.c = new Character();
             }
-            else
+
+            this.c.Debug = Settings.Debug;
+
+            // Setup the memory watcher
+            Program.Instance = Engine.Create();
+            Program.CurrentActor = Enigma.D3.Helpers.ActorHelper.GetLocalActor();
+            Program.CurrentACD = Enigma.D3.Helpers.ActorCommonDataHelper.GetLocalAcd();
+            this.c.Id = Program.CurrentActor.x000_Id;
+
+            // get our character from redis if it exists.
+            using (var redisClient = new RedisClient(Settings.RedisHost, Settings.RedisPort))
             {
-                Area area = new Area();
-                this.Areas = area;
-
-                if (c == null)
+                IRedisTypedClient<Character> redis = redisClient.As<Character>();
+                var currentCharacters = redis.Lists["urn:characters:current"];
+                if (currentCharacters.Count > 0)
                 {
-                    c = new Character();
-                }
-
-                c.Debug = Settings.Debug;
-
-                // Setup the memory watcher
-                Program.Instance = Engine.Create();
-                Program.CurrentActor = Enigma.D3.Helpers.ActorHelper.GetLocalActor();
-                Program.CurrentACD = Enigma.D3.Helpers.ActorCommonDataHelper.GetLocalAcd();
-                c.Id = Program.CurrentActor.x000_Id;
-
-                // get our character from redis if it exists.
-                using (var redisClient = new RedisClient(Settings.RedisHost, Settings.RedisPort))
-                {
-                    IRedisTypedClient<Character> redis = redisClient.As<Character>();
-                    var currentCharacters = redis.Lists["urn:characters:current"];
-                    if (currentCharacters.Count > 0)
+                    // retrieve our character from redis with the appropriate debug flag.
+                    var character = currentCharacters.SingleOrDefault(ch => ch.Id == this.c.Id && ch.Debug == Settings.Debug);
+                    if (character != default(Character))
                     {
-                        // retrieve our character from redis with the appropriate debug flag.
-                        var character = currentCharacters.SingleOrDefault(ch => ch.Id == c.Id && ch.Debug == Settings.Debug);
-                        if (character != default(Character))
-                        {
-                            c = character;
-                            Console.WriteLine(string.Format("Loaded Character {0} with {1} experience", character.Name, character.ExperienceEarned));
-                        }
+                        this.c = character;
+                        Console.WriteLine(string.Format("Loaded Character {0} with {1} experience", character.Name, character.ExperienceEarned));
                     }
                 }
-
-
-                t = new Timer(Settings.Interval);
-                t.Elapsed += TimerElapsedHandler;
-                t.Enabled = true;
-
-                Console.ReadLine();
             }
+
+            this.t = new Timer(Settings.Interval);
+            this.t.Elapsed += this.TimerElapsedHandler;
+            this.t.Enabled = true;
+
+            Console.ReadLine();
         }
 
-        void TimerElapsedHandler(object sender, ElapsedEventArgs e)
+        /// <summary>
+        /// Timer tick handler.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
+        private void TimerElapsedHandler(object sender, ElapsedEventArgs e)
         {
             var actor = Program.CurrentActor;
             var acd = Program.CurrentACD;
 
-            c.Name = actor.x004_Name;
-            c.Id = actor.x000_Id;
+            this.c.Name = actor.x004_Name;
+            this.c.Id = actor.x000_Id;
 
-            c.Level = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Level);
-            c.Paragon = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Alt_Level);
-            c.ExperienceRemaining = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Alt_Experience_Next_Lo);
-            c.ExperienceNeeded = Paragon.paragon[c.Paragon + 1];
-            c.ExperienceEarned = c.ExperienceNeeded - c.ExperienceRemaining;
+            this.c.Level = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Level);
+            this.c.Paragon = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Alt_Level);
+            this.c.ExperienceRemaining = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Alt_Experience_Next_Lo);
+            this.c.ExperienceNeeded = Paragon.Paragon[this.c.Paragon + 1];
+            this.c.ExperienceEarned = this.c.ExperienceNeeded - this.c.ExperienceRemaining;
 
+            this.c.Intelligence = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Intelligence_Total);
+            this.c.Vitality = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Vitality_Total);
+            this.c.Armor = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Armor_Total);
+            this.c.Dexterity = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Dexterity_Total);
+            this.c.Strength = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Strength_Total);
 
-            c.Intelligence = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Intelligence_Total);
-            c.Vitality = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Vitality_Total);
-            c.Armor = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Armor_Total);
-            c.Dexterity = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Dexterity_Total);
-            c.Strength = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Strength_Total);
-
-            c.HealthTotal = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Max_Total);
-            c.HealthCurrent = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Cur);
+            this.c.HealthTotal = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Max_Total);
+            this.c.HealthCurrent = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Cur);
 
             int zoneId = Enigma.D3.Helpers.WorldHelper.GetLocalWorld().x04_SnoId;
 
-            if (oldExperience != 0)
+            if (this.oldExperience != 0)
             {
-                double experience = c.ExperienceEarned - oldExperience;
-                if (c.ExperienceEarnedTotal > 0)
+                double experience = this.c.ExperienceEarned - this.oldExperience;
+                if (this.c.ExperienceEarnedTotal > 0)
                 {
-                    experienceEarnedTotal = c.ExperienceEarnedTotal;
-                    experienceStartPosition = experienceEarnedTotal;
+                    this.experienceEarnedTotal = this.c.ExperienceEarnedTotal;
+                    this.experienceStartPosition = this.experienceEarnedTotal;
                     Console.WriteLine("Recalculating experience start position for new zone");
                 }
                 else
                 {
-                    experienceEarnedTotal += experience;
+                    this.experienceEarnedTotal += experience;
                 }
 
-                Console.WriteLine(string.Format("Experience start position: {0}", experienceStartPosition));
+                Console.WriteLine(string.Format("Experience start position: {0}", this.experienceStartPosition));
 
-                c.ExperienceEarned += experience;
+                this.c.ExperienceEarned += experience;
 
                 // check if we have changed zones since last time we checked
-                if (currentZone != zoneId)
+                if (this.currentZone != zoneId)
                 {
                     // update the previous zone - if it exists
-                    if (c.Zones.ContainsKey(currentZone))
+                    if (this.c.Zones.ContainsKey(this.currentZone))
                     {
-                        c.Zones[currentZone].Leave = DateTime.Now;
+                        this.c.Zones[this.currentZone].Leave = DateTime.Now;
                     }
 
                     // zone has changed - set experienceStartPosition to experienceEarnedTotal
-                    experienceStartPosition = c.ExperienceEarned;
-                    Console.WriteLine(string.Format("Zone has changed, old {0} new {1}", currentZone, zoneId));
+                    this.experienceStartPosition = this.c.ExperienceEarned;
+                    Console.WriteLine(string.Format("Zone has changed, old {0} new {1}", this.currentZone, zoneId));
                 }
 
-                if (c.Zones.ContainsKey(zoneId))
+                if (this.c.Zones.ContainsKey(zoneId))
                 {
                     // zone exists in list - append experience to this zone.
-                    c.Zones[zoneId].ExperienceEarned += experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
-                    c.Zones[zoneId].Duration += (double)Settings.Interval / (double)1000;
-                    c.Zones[zoneId].Enter = DateTime.Now;
-                    currentZone = zoneId;
+                    this.c.Zones[zoneId].ExperienceEarned += this.experienceEarnedTotal - this.c.Zones.Sum(entity => entity.Value.ExperienceEarned);
+                    this.c.Zones[zoneId].Duration += (double)Settings.Interval / (double)1000;
+                    this.c.Zones[zoneId].Enter = DateTime.Now;
+                    this.currentZone = zoneId;
                 }
                 else
                 {
                     Zone zone = new Zone();
                     zone.Id = zoneId;
                     zone.Enter = DateTime.Now;
-                    zone.ExperienceEarned = experienceEarnedTotal - c.Zones.Sum(entity => entity.Value.ExperienceEarned);
-                    c.Zones.Add(zoneId, zone);
-                    currentZone = zoneId;
+                    zone.ExperienceEarned = this.experienceEarnedTotal - this.c.Zones.Sum(entity => entity.Value.ExperienceEarned);
+                    this.c.Zones.Add(zoneId, zone);
+                    this.currentZone = zoneId;
                 }
 
-                c.ExperienceEarnedTotal = experienceEarnedTotal;
+                this.c.ExperienceEarnedTotal = this.experienceEarnedTotal;
 
                 using (var redisClient = new RedisClient(Settings.RedisHost, Settings.RedisPort))
                 {
@@ -179,12 +182,12 @@ namespace TabletHUD
                     var currentCharacters = redis.Lists["urn:characters:current"];
 
                     currentCharacters.RemoveAll();
-                    currentCharacters.Add(c);
+                    currentCharacters.Add(this.c);
                 }
             }
             else
             {
-                oldExperience = c.ExperienceEarned;
+                this.oldExperience = this.c.ExperienceEarned;
                 Console.WriteLine("Updating experience old position");
             }
         }

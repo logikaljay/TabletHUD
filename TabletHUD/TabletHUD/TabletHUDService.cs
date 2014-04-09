@@ -1,7 +1,4 @@
-﻿using Microsoft.Owin.Hosting;
-using System;
-using System.Collections.Generic;
-// -----------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------
 // <copyright file="TabletHUDService.cs" company="4o4">
 // Copyright 2014 Efinity Group Limited. All Rights Reserved.
 // </copyright>
@@ -9,6 +6,8 @@ using System.Collections.Generic;
 
 namespace TabletHUD
 {
+    using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Configuration;
     using System.Data;
@@ -16,16 +15,22 @@ namespace TabletHUD
     using System.Linq;
     using System.ServiceProcess;
     using System.Text;
-    using System.Threading.Tasks;
-    using Enigma.D3;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
+    using Microsoft.Owin.Hosting;
 
+    /// <summary>
+    /// TabletHUD Service
+    /// </summary>
     public partial class TabletHUDService : ServiceBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TabletHUDService"/> class.
+        /// </summary>
         public TabletHUDService()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         /// <summary>
@@ -58,11 +63,10 @@ namespace TabletHUD
                 Program.Instance.Dispose();
             }
 
-            if (Program.webApp != null)
+            if (Program.WebApp != null)
             {
-                Program.webApp.Dispose();
+                Program.WebApp.Dispose();
             }
-
 
             base.OnStop();
         }

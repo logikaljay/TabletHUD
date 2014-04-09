@@ -1,6 +1,15 @@
-﻿namespace TabletHUD
+﻿// -----------------------------------------------------------------------
+// <copyright file="TabletHUDService.Designer.cs" company="4o4">
+// Copyright 2014 Efinity Group Limited. All Rights Reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace TabletHUD
 {
-    partial class TabletHUDService
+    /// <summary>
+    /// TabletHUDService class
+    /// </summary>
+    public partial class TabletHUDService
     {
         /// <summary> 
         /// Required designer variable.
@@ -13,10 +22,11 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing && (this.components != null))
             {
-                components.Dispose();
+                this.components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 

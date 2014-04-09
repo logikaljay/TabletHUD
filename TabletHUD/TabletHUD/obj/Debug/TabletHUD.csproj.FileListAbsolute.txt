@@ -140,3 +140,6 @@ D:\TabletHUD\TabletHUD\TabletHUD\bin\Debug\ServiceStack.Text.xml
 D:\TabletHUD\TabletHUD\TabletHUD\obj\Debug\TabletHUD.csprojResolveAssemblyReference.cache
 D:\TabletHUD\TabletHUD\TabletHUD\obj\Debug\TabletHUD.exe
 D:\TabletHUD\TabletHUD\TabletHUD\obj\Debug\TabletHUD.pdb
+Z:\Temp\TabletHUD\TabletHUD\TabletHUD\bin\Debug\TabletHUD.exe.config
+Z:\Temp\TabletHUD\TabletHUD\TabletHUD\obj\Debug\TabletHUD.exe
+Z:\Temp\TabletHUD\TabletHUD\TabletHUD\obj\Debug\TabletHUD.pdb

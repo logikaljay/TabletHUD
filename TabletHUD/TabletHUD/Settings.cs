@@ -1,17 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿// -----------------------------------------------------------------------
+// <copyright file="Settings.cs" company="4o4">
+// Copyright 2014 Efinity Group Limited. All Rights Reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace TabletHUD
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Settings class that contains app specific settings
+    /// </summary>
     public static class Settings
     {
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="Settings"/> is debug.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if debug; otherwise, <c>false</c>.
+        /// </value>
         public static bool Debug
         {
             get
@@ -26,6 +41,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the debug character.
+        /// </summary>
+        /// <value>
+        /// The debug character.
+        /// </value>
         public static Character DebugCharacter
         {
             get
@@ -33,7 +54,7 @@ namespace TabletHUD
                 Character c = new Character();
                 c.Debug = true;
                 c.Id = 1;
-                c.Name = "gotdeeps";
+                c.Name = "fdsafdsa";
                 c.Level = 70;
                 c.Paragon = 84;
                 c.ExperienceNeeded = 127000000;
@@ -50,6 +71,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the event log.
+        /// </summary>
+        /// <value>
+        /// The event log.
+        /// </value>
         public static EventLog EventLog
         {
             get
@@ -60,6 +87,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the interval.
+        /// </summary>
+        /// <value>
+        /// The interval.
+        /// </value>
         public static int Interval
         {
             get
@@ -72,8 +105,14 @@ namespace TabletHUD
 
                 return interval;
             }
-        }       
+        }
 
+        /// <summary>
+        /// Gets the Redis host.
+        /// </summary>
+        /// <value>
+        /// The Redis host.
+        /// </value>
         public static string RedisHost
         {
             get
@@ -89,6 +128,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the redis port.
+        /// </summary>
+        /// <value>
+        /// The redis port.
+        /// </value>
         public static int RedisPort
         {
             get
@@ -103,6 +148,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the URL for SignalR.
+        /// </summary>
+        /// <value>
+        /// The URL for SignalR.
+        /// </value>
         public static string Url
         {
             get
@@ -117,6 +168,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the name of the service.
+        /// </summary>
+        /// <value>
+        /// The name of the service.
+        /// </value>
         public static string ServiceName
         {
             get
@@ -125,6 +182,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the version.
+        /// </summary>
+        /// <value>
+        /// The version.
+        /// </value>
         public static string Version
         {
             get
@@ -133,6 +196,12 @@ namespace TabletHUD
             }
         }
 
+        /// <summary>
+        /// Gets the web folder.
+        /// </summary>
+        /// <value>
+        /// The web folder.
+        /// </value>
         public static string WebFolder
         {
             get

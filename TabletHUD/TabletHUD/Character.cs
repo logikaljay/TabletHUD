@@ -6,19 +6,22 @@
 
 namespace TabletHUD
 {
-    using Microsoft.AspNet.SignalR;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using System.Timers;
+    using Microsoft.AspNet.SignalR;
 
     /// <summary>
     /// Character class for TabletHUD
     /// </summary>
     public class Character
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Character"/> class.
+        /// </summary>
         public Character()
         {
             this.Zones = new Dictionary<int, Zone>();
@@ -127,26 +130,26 @@ namespace TabletHUD
         public int Strength { get; set; }
 
         /// <summary>
-        /// Gets or sets the int total.
+        /// Gets or sets the Intelligence.
         /// </summary>
         /// <value>
-        /// The int total.
+        /// The Intelligence.
         /// </value>
         public int Intelligence { get; set; }
 
         /// <summary>
-        /// Gets or sets the vit total.
+        /// Gets or sets the Vitality.
         /// </summary>
         /// <value>
-        /// The vit total.
+        /// The Vitality.
         /// </value>
         public int Vitality { get; set; }
 
         /// <summary>
-        /// Gets or sets the armor total.
+        /// Gets or sets the armor.
         /// </summary>
         /// <value>
-        /// The armor total.
+        /// The armor.
         /// </value>
         public int Armor { get; set; }
 
