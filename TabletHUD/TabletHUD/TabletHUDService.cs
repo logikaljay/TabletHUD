@@ -63,9 +63,9 @@ namespace TabletHUD
                 Program.Instance.Dispose();
             }
 
-            if (Program.WebApp != null)
+            if (Program.WebAppInstance != null)
             {
-                Program.WebApp.Dispose();
+                Program.WebAppInstance.Dispose();
             }
 
             base.OnStop();

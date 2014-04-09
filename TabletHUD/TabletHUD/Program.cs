@@ -26,7 +26,7 @@ namespace TabletHUD
         /// <summary>
         /// Gets or sets the paragon level requirements
         /// </summary>
-        private static long[] paragonLevelRequirements = Paragon.Paragon;
+        private static long[] paragonLevelRequirements = Paragon.Levels;
 
         /// <summary>
         /// Gets or sets the web application
@@ -34,7 +34,7 @@ namespace TabletHUD
         /// <value>
         /// The web application.
         /// </value>
-        public static IDisposable WebApp { get; set; }
+        public static IDisposable WebAppInstance { get; set; }
 
         /// <summary>
         /// Gets or sets the current actor
@@ -67,7 +67,7 @@ namespace TabletHUD
         [STAThread]
         public static void Main(string[] args)
         {
-            WebApp = WebApp.Start<SignalRStartup>(Settings.Url);
+            WebAppInstance = WebApp.Start<SignalRStartup>(Settings.Url);
 
             if (args.Length > 0) 
             {

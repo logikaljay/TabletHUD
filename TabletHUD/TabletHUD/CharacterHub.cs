@@ -181,7 +181,7 @@ namespace TabletHUD
             this.c.Level = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Level);
             this.c.Paragon = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Alt_Level);
             this.c.ExperienceRemaining = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Alt_Experience_Next_Lo);
-            this.c.ExperienceNeeded = Paragon.Paragon[this.c.Paragon + 1];
+            this.c.ExperienceNeeded = Paragon.Levels[this.c.Paragon + 1];
             this.c.ExperienceEarned = this.c.ExperienceNeeded - this.c.ExperienceRemaining;
 
             this.c.Intelligence = (int)Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Intelligence_Total);

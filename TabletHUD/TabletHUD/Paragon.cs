@@ -19,7 +19,7 @@ namespace TabletHUD
         /// <value>
         /// The paragon experience array.
         /// </value>
-        public static long[] Paragon
+        public static long[] Levels
         {
             get
             {

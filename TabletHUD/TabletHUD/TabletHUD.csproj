@@ -221,7 +221,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Desktop\Enigma.D3 %282.0.4.23119%29 r99\Enigma.D3.csproj">
+    <ProjectReference Include="..\..\..\Enigma.D3 %282.0.4.23119%29 r99\Enigma.D3.csproj">
       <Project>{23848103-7dc0-4ab0-958f-b8793ffd1f2d}</Project>
       <Name>Enigma.D3</Name>
     </ProjectReference>
