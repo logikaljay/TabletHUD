@@ -100,6 +100,14 @@ namespace TabletHUD
         /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
         private void TimerElapsedHandler(object sender, ElapsedEventArgs e)
         {
+            // check for objectManager being null before accessing any memory.
+            if (Program.Instance == null || Program.Instance == default(Engine) || Engine.Current.ObjectManager == null || Engine.Current.ObjectManager == default(ObjectManager))
+            {
+                Program.Instance = Engine.Create();
+                Program.CurrentActor = Enigma.D3.Helpers.ActorHelper.GetLocalActor();
+                Program.CurrentACD = Enigma.D3.Helpers.ActorCommonDataHelper.GetLocalAcd();
+            }
+
             var actor = Program.CurrentActor;
             var acd = Program.CurrentACD;
 
@@ -121,7 +129,7 @@ namespace TabletHUD
             this.c.HealthTotal = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Max_Total);
             this.c.HealthCurrent = Enigma.D3.Helpers.AttributeHelper.GetAttributeValue(acd, Enigma.D3.Enums.AttributeId.Hitpoints_Cur);
 
-            int zoneId = Enigma.D3.Helpers.WorldHelper.GetLocalWorld().x04_SnoId;
+            int zoneId = Engine.Current.LevelArea.x044_SnoId;
 
             if (this.oldExperience != 0)
             {
@@ -167,6 +175,7 @@ namespace TabletHUD
                 {
                     Zone zone = new Zone();
                     zone.Id = zoneId;
+                    zone.Name = Engine.Current.LevelAreaName;
                     zone.Enter = DateTime.Now;
                     zone.ExperienceEarned = this.experienceEarnedTotal - this.c.Zones.Sum(entity => entity.Value.ExperienceEarned);
                     this.c.Zones.Add(zoneId, zone);
