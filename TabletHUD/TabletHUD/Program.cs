@@ -8,6 +8,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace TabletHUD
 {
@@ -35,7 +36,8 @@ namespace TabletHUD
             if (args.Length > 0) {
                 RunService();
             } else {
-                RunConsole();
+                Debug d = new Debug();
+                d.RunConsole();
             }
         }
 
@@ -49,11 +51,6 @@ namespace TabletHUD
             };
 
             ServiceBase.Run(ServicesToRun);
-        }
-
-        static void RunConsole()
-        {
-            Console.ReadLine();
         }
     }
 }

@@ -95,6 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Character.cs" />
+    <Compile Include="Debug.cs" />
+    <Compile Include="Infrastructure\Area.cs" />
     <Compile Include="Paragon.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TabletHUDService.cs">
@@ -114,12 +116,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Enigma.D3\Enigma.D3.csproj">
-      <Project>{23848103-7dc0-4ab0-958f-b8793ffd1f2d}</Project>
-      <Name>Enigma.D3</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web\browserconfig.xml">
@@ -224,7 +220,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Desktop\Enigma.D3 %282.0.4.23119%29 r99\Enigma.D3.csproj">
+      <Project>{23848103-7dc0-4ab0-958f-b8793ffd1f2d}</Project>
+      <Name>Enigma.D3</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

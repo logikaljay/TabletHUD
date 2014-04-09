@@ -122,14 +122,15 @@
 			var player = $.connection.characterHub;
 			player.client.addMessage = function(data) {
 			    var obj = JSON.parse(data);
-			    console.log(obj);
+			    
+                
 				$xpBar.progressbar("option", {
 					value: obj.ExperiencePercent
 				});
-				
 				$xpTitle.text(obj.Name + " - Level: " + obj.Level + " (" + obj.Paragon + ")");
 				$xpBarLabel.text(commas(obj.ExperienceEarned) + " / " + commas(obj.ExperienceNeeded) + " (" + obj.ExperiencePercent + "%)");
 				
+
 				$hpBar.progressbar("option", {
 					value: obj.HealthPercent
 				});
@@ -140,10 +141,15 @@
 				var totalDuration = 0;
 				
 				for(var key in areas) {
-					var area = areas[key];
+				    var area = areas[key];
 					
-					totalDuration = totalDuration + area.Duration;
-					var percentage = area.ExperienceEarned / obj.ExperienceEarnedTotal * 100;
+				    totalDuration = Number(totalDuration.toFixed(0)) + Number(area.Duration.toFixed(0));
+
+					var percentage = 0;
+					if (area.ExperienceEarned > 0) {
+					    percentage = area.ExperienceEarned / obj.ExperienceEarnedTotal * 100;
+					}
+
 					html += "<tr class='area'>"+
 								"<td>" +
 									area.Id +
@@ -160,10 +166,10 @@
 								"</td>" +
 							"</tr>";
 				};
-				
+
 				html += "<tr class='total'>" +
 							"<td>Total:</td>"+
-							"<td>"+time(totalDuration)+"</td>"+
+							"<td>" + time(totalDuration) + "</td>" +
 							"<td>"+
 								commas(obj.ExperienceEarnedTotal) +
 							"</td>"+
@@ -171,26 +177,27 @@
 						"</tr>";
 				$("#breakdown").html(html);
 				
-				// work out time to level
-				var experienceRemaining = obj.ExperienceNeeded - obj.ExperienceEarned;
-				var experiencePerSecond = obj.ExperienceEarnedTotal / totalDuration;
-				var $ttl = $("#ttl");
-				var ttl = "<p>" +
-							"Experience remaining: <b>" + commas(experienceRemaining) +"</b>"+
-							"<br />experience per second: <b>" + commas(experiencePerSecond.toFixed(0)) +"</b>"+
-							"<br />Time to level " +
-								(obj.Paragon + 1) + ": <b>"
-								+ time(experienceRemaining / experiencePerSecond) +"</b>"+
-						  "</p>";
-				$ttl.html(ttl);
+
+			    // work out time to level
+				if (obj.ExperienceEarnedTotal > 0) {
+				    var experienceRemaining = obj.ExperienceNeeded - obj.ExperienceEarned;
+				    var experiencePerSecond = obj.ExperienceEarnedTotal / totalDuration.toFixed(2);
+				    var $ttl = $("#ttl");
+				    var ttl = "<p>" +
+                                "Experience remaining: <b>" + commas(experienceRemaining) + "</b>" +
+                                "<br />experience per second: <b>" + commas(experiencePerSecond.toFixed(0)) + "</b>" +
+                                "<br />Time to level " +
+                                    (obj.Paragon + 1) + ": <b>"
+                                    + time(experienceRemaining / experiencePerSecond) + "</b>" +
+                              "</p>";
+				    $ttl.html(ttl);
+				}
 					
 			};
 			
 			$.connection.hub.start().done(function() {
 				// console.log("listening for messages");
-			});
-			
-			
+			});			
 		});
 		
 	</script>
